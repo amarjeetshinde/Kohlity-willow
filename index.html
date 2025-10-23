@@ -58,11 +58,20 @@
             margin-bottom: 30px;
         }
 
-        #videoPlayer {
+        .iframe-wrapper {
+            position: relative;
+            padding-bottom: 56.25%; /* 16:9 aspect ratio */
+            height: 0;
+            overflow: hidden;
+        }
+
+        .iframe-wrapper iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
             width: 100%;
-            height: auto;
-            min-height: 400px;
-            display: block;
+            height: 100%;
+            border: none;
         }
 
         .live-badge {
@@ -224,10 +233,6 @@
                 font-size: 2em;
             }
 
-            #videoPlayer {
-                min-height: 250px;
-            }
-
             .alert-box {
                 max-width: 320px;
             }
@@ -262,7 +267,13 @@
                 <div class="live-dot"></div>
                 LIVE
             </div>
-            <video id="videoPlayer" controls autoplay></video>
+            <div class="iframe-wrapper">
+                <iframe src="https://suii-willow.vercel.app/" 
+                        loading="lazy"
+                        allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture; fullscreen; geolocation; web-share; speaker-selection; screen-wake-lock; idle-detection" 
+                        allowfullscreen>
+                </iframe>
+            </div>
         </div>
 
         <div class="info-section">
@@ -273,38 +284,8 @@
         </div>
     </div>
 
-    <!-- HLS.js Library -->
-    <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
-
     <script>
-        const video = document.getElementById('videoPlayer');
-        const streamUrl = 'https://fl25.moveonjoy.com/WILLOW_CRICKET/index.m3u8';
         const alertPopup = document.getElementById('alertPopup');
-
-        // Initialize video player with HLS
-        function initPlayer() {
-            if (Hls.isSupported()) {
-                const hls = new Hls({
-                    enableWorker: true,
-                    lowLatencyMode: true,
-                });
-                hls.loadSource(streamUrl);
-                hls.attachMedia(video);
-                hls.on(Hls.Events.MANIFEST_PARSED, function() {
-                    video.play().catch(e => console.log('Autoplay prevented'));
-                });
-                hls.on(Hls.Events.ERROR, function(event, data) {
-                    if (data.fatal) {
-                        console.error('HLS Error:', data);
-                    }
-                });
-            } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
-                video.src = streamUrl;
-                video.addEventListener('loadedmetadata', function() {
-                    video.play().catch(e => console.log('Autoplay prevented'));
-                });
-            }
-        }
 
         // Alert popup functions
         function showAlert() {
@@ -321,10 +302,9 @@
             closeAlert();
         }
 
-        // Show popup and initialize player on page load
+        // Show popup on page load
         window.onload = function() {
             showAlert();
-            initPlayer();
         };
     </script>
 </body>
